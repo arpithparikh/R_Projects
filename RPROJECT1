@@ -1,0 +1,30 @@
+library("sna")
+library("igraph")
+# Matrix for Path length 2
+result = connectionGraph %*% connectionGraph
+
+# prestige
+prestigeCalculation<-prestige(connectionGraph,cmode ="domain")
+
+# centrality
+g <- graph.adjacency(connectionGraph,weighted=NULL, mode="directed")
+palette <- c("purple","brown","green","yellow","orange","red")
+par(mfrow=c(1,2))
+# degree centrality
+c.d   <- degree(g)
+message(c.d)
+col <- as.integer(5*(c.d-min(c.d))/diff(range(c.d))+1)
+set.seed(1)
+plot(g,vertex.color=palette[col],main="Degree Centrality for the EmailSubset",
+     layout=layout.fruchterman.reingold)
+
+#betweenness, Indegree and Outdegree
+EE<-graph.adjacency(connectionGraph)
+plot(EE, edge.arrow.size=.5)
+indegreeG <- degree(EE, mode="in") 
+outdegreeG <- degree(EE, mode="out") 
+betweennessG <- betweenness(EE)
+
+g <- random.graph.game(10, 3/10)
+betweenness(g)
+
