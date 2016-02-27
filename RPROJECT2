@@ -1,0 +1,148 @@
+
+# reading data
+library(readr)
+path <- ("F:/Big data/project2/agaricus-lepiota.data")
+email <- read_lines(path)
+dataMatrix <- matrix(0, nrow = 8124, ncol = 23)
+for (i in 1: length(email)) {
+  iRow <- strsplit(email[i],split = ",", fixed = TRUE)
+  dataMatrix[i,] <- iRow[[1]]
+}
+
+# naming columns
+colnames(dataMatrix) <- c("class","cshape","csurface","ccolor",
+                          "bruises","odor","gattach",
+                          "gspace","gsize","gcolor",
+                          "sshape","sroot","ssabove",
+                          "ssbelow","scabove",
+                          "scbelow","vtype","vcolor","rnumber","rtype",
+                          "spcolor","popnum","habitat")
+
+# data frame
+mr.df<- as.data.frame(dataMatrix)
+
+# getting columns and updating them with numbers
+
+colvals1 <- dataMatrix[,"class"]
+for (i in 1: length(colvals1)) {
+  if (colvals1[i] == "p") {
+    colvals1[i] <- 0
+  } else {
+    colvals1[i] <- 1
+  }
+}
+# forming numeric matrix
+
+dataMatrixNumeric <- cbind(as.numeric(colvals1),as.numeric(colvals2),as.numeric(colvals3),as.numeric(colvals4),
+                           as.numeric(colvals5),as.numeric(colvals6),as.numeric(colvals7),
+                           as.numeric(colvals8),as.numeric(colvals9),as.numeric(colvals10),
+                           as.numeric(colvals11),as.numeric(colvals12),as.numeric(colvals13),
+                           as.numeric(colvals14),as.numeric(colvals15),as.numeric(colvals16),
+                           as.numeric(colvals17),as.numeric(colvals18),as.numeric(colvals19),
+                           as.numeric(colvals20),as.numeric(colvals21),as.numeric(colvals22),
+                           as.numeric(colvals23))
+
+mushroomNum.df <- data.frame(class = as.numeric(colvals1), cshape =as.numeric(colvals2),
+                         csurface = as.numeric(colvals3),ccolor = as.numeric(colvals4),
+                         bruises= as.numeric(colvals5),odor = as.numeric(colvals6),
+                         gattach = as.numeric(colvals7),gspace = as.numeric(colvals8),
+                         gsize = as.numeric(colvals9),gcolor = as.numeric(colvals10),
+                         sshape = as.numeric(colvals11),sroot =as.numeric(colvals12),
+                         ssabove =as.numeric(colvals13),ssbelow = as.numeric(colvals14),
+                         scabove = as.numeric(colvals15),scbelow = as.numeric(colvals16),
+                         vtype = as.numeric(colvals17),vcolor = as.numeric(colvals18),
+                         rnumber =as.numeric(colvals19),rtype = as.numeric(colvals20),
+                         spcolor = as.numeric(colvals21), popnum =as.numeric(colvals22),
+                         habitat = as.numeric(colvals23))
+
+mushroomData.df <- data.frame(cshape =as.numeric(colvals2),
+                             csurface = as.numeric(colvals3),ccolor = as.numeric(colvals4),
+                             bruises= as.numeric(colvals5),odor = as.numeric(colvals6),
+                             gattach = as.numeric(colvals7),gspace = as.numeric(colvals8),
+                             gsize = as.numeric(colvals9),gcolor = as.numeric(colvals10),
+                             sshape = as.numeric(colvals11),sroot =as.numeric(colvals12),
+                             ssabove =as.numeric(colvals13),ssbelow = as.numeric(colvals14),
+                             scabove = as.numeric(colvals15),scbelow = as.numeric(colvals16),
+                             vtype = as.numeric(colvals17),vcolor = as.numeric(colvals18),
+                             rnumber =as.numeric(colvals19),rtype = as.numeric(colvals20),
+                             spcolor = as.numeric(colvals21), popnum =as.numeric(colvals22),
+                             habitat = as.numeric(colvals23))
+# plotting attributes
+attach(mushroomNum.df)
+plot(class,cshape,main="diagram", xlab = "class", ylab ="odor",pch=19)
+abline(lm(cshape ~ class), col ="red", lwd = 2, lty = 1)
+lines(lowess(class,cshape), col = "blue", lwd = 2, lty = 1)
+detach(mushroomNum.df)
+
+
+pairs(~ class + cshape + csurface + ccolor+ bruises + odor + gattach
+  + gspace + gsize + gcolor + sshape + sroot + ssabove + ssbelow
+  + scabove + scbelow + vtype + vcolor + rnumber + rtype + spcolor
+  + popnum + habitat ,
+      data = mushroomNum.df, main = "Attribute Scatterplot", upper.panel = NULL)
+
+
+pairs(~ class + cshape + csurface + ccolor+ bruises + odor + gattach
+      + gspace ,
+      data = mushroomdf, main = "Attribute Scatterplot", upper.panel = NULL)
+
+pairs(~ gsize + gcolor + sshape + sroot + ssabove + ssbelow
+      + scabove + scbelow + vtype,
+      data = mushroomNum.df, main = "Attribute Scatterplot", upper.panel = NULL)
+
+pairs(~ vcolor + rnumber + rtype + spcolor
+      + popnum + habitat,
+      data = mushroomNum.df, main = "Attribute Scatterplot", upper.panel = NULL)
+
+# clustering
+set.seed(1234567)
+# 50-50 sets
+train1.df <- sample(nrow(mushroomNum.df), 0.5*nrow(mushroomNum.df))
+mrtarin1.df <- mushroomNum.df[train1.df,]
+mrtest1.df <- mushroomNum.df[-train1.df,]
+# 60-40 sets
+train2.df <- sample(nrow(mushroomNum.df), 0.6*nrow(mushroomNum.df))
+mrtarin2.df <- mushroomNum.df[train2.df,]
+mrtest2.df <- mushroomNum.df[-train2.df,]
+# 70-30 sets
+train3.df <- sample(nrow(mushroomNum.df), 0.7*nrow(mushroomNum.df))
+mrtarin3.df <- mushroomNum.df[train3.df,]
+mrtest3.df <- mushroomNum.df[-train3.df,]
+# number of edible and poisonous records in test data
+table(mrtarin1.df$class)
+table(mrtest1.df$class)
+table(mrtarin2.df$class)
+table(mrtest2.df$class)
+table(mrtarin3.df$class)
+table(mrtest3.df$class)
+# k-Means
+#50-50
+library(NbClust)
+kc11 <- kmeans(mrtarin1.df[-1], 2)
+library(cluster)
+library(fpc)
+set.seed(1234567)
+plotcluster(mrtarin1.df, kc11$cluster)
+clusplot(mrtarin1.df, kc11$cluster, color=TRUE, shade=TRUE, 
+         labels=2, lines=0)
+table(kc11$cluster)
+
+# hierarchal clustering
+library(stats)
+d <- dist(mrtarin1.df, method = "euclidean", diag = FALSE, upper = FALSE, p = 3)
+x <- hclust(d, method = "complete", members = NULL)
+plot(x, labels = NULL, hang = 0.1, check = TRUE,
+     axes = TRUE, frame.plot = FALSE, ann = TRUE,
+     main = "Cluster Dendrogram",
+     sub = NULL, xlab = NULL, ylab = "Height")
+
+# k - nearest neighbour
+ 
+library(class)
+kn11 <- knn(mrtarin1.df[-1],mrtest1.df[-1],mrtest1.df$class,k=1,prob=TRUE)
+attributes(.Last.value)
+library(cluster)
+library(fpc)
+plotcluster(mrtest1.df,kn11)
+table(kn11)
+
